@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PDF Reader</title>
+        <style>
+        /* General reset and styling */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            display: flex;
+            flex-direction: row;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f8f9fa;
+            color: #333;
+            margin: 0;
+            height: 100vh;
+        }
+
+        /* Main content styling */
+        #content {
+            flex: 2;
+            padding: 30px;
+            background-color: #ffffff;
+            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            margin-bottom: 20px;
+            color: #007bff;
+        }
+
+        form {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        input[type="file"] {
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        button {
+            padding: 10px 15px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background-color 0.3s;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        #message {
+            margin-bottom: 20px;
+            font-weight: bold;
+            color: #28a745;
+        }
+
+        #controls {
+            display: flex;
+            gap: 10px;
+        }
+
+        /* Sidebar styling */
+        #sidebar {
+            flex: 1;
+            border-left: 2px solid #ddd;
+            padding: 20px;
+            background-color: #f1f1f1;
+            overflow-y: auto;
+        }
+
+        h2 {
+            margin-bottom: 15px;
+            color: #6c757d;
+        }
+
+        #textContent {
+            white-space: pre-wrap;
+            line-height: 1.6;
+            font-size: 14px;
+            color: #555;
+        }
+
+        /* Scrollbar styling */
+        #sidebar::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        #sidebar::-webkit-scrollbar-thumb {
+            background-color: #bbb;
+            border-radius: 4px;
+        }
+
+        #sidebar::-webkit-scrollbar-thumb:hover {
+            background-color: #888;
+        }
+    </style>
+
+</head>
+<body>
+    <div id="content">
+        <h1>PDF Reader</h1>
+        <form id="uploadForm" enctype="multipart/form-data">
+            <input type="file" name="pdf" accept="application/pdf">
+            <button type="submit">Upload</button>
+        </form>
+
+        <div id="message"></div>
+
+        <div id="controls">
+            <button onclick="playText()">Play</button>
+            <button onclick="pauseText()">Pause</button>
+            <button onclick="previousPage()">Previous Page</button>
+            <button onclick="nextPage()">Next Page</button>
+        </div>
+    </div>
+
+    <div id="sidebar">
+        <h2>Text Content</h2>
+        <div id="textContent"></div>
+    </div>
+
+    <script>
+        
+        // Handle form submission using JavaScript
+        document.getElementById('uploadForm').addEventListener('submit', function(event) {
+            event.preventDefault(); // Prevent the form from submitting the traditional way
+
+            const formData = new FormData(this);
+
+            fetch('/upload', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('message').innerText = "PDF uploaded successfully!";
+                document.getElementById('textContent').innerText = data.text; // Display the text in the sidebar
+                playText(); // Automatically start reading the text
+            })
+            .catch(error => {
+                document.getElementById('message').innerText = "Error uploading PDF.";
+            });
+        });
+
+        function playText() {
+            fetch('/play').then(response => response.text()).then(alert);
+        }
+        function pauseText() {
+            fetch('/pause').then(response => response.text()).then(alert);
+        }
+        function nextPage() {
+            fetch('/next_page').then(response => response.text()).then(alert);
+        }
+        function previousPage() {
+            fetch('/previous_page').then(response => response.text()).then(alert);
+        }
+    </script>
+</body>
+</html>
